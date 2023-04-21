@@ -73,6 +73,7 @@ class MyGame(arcade.Window):
 
         self.physics_engine = None
         self.Spressed = False
+        self.pause = None
 
         # --- Related to paths
         # List of points that makes up a path between two points
@@ -116,6 +117,7 @@ class MyGame(arcade.Window):
         self.i = 0
         part = arcade.Point
         self.lastsoulpo = False
+        self.pause = True
         
 
         # Set up the player
@@ -347,7 +349,7 @@ class MyGame(arcade.Window):
 
 
         
-        if self.path:
+        if self.path and self.pause:
             for x in self.mgoal_list :
                 x.color = (255 , 255 , 255)
             #self.mgoal_list.color = 
@@ -440,7 +442,7 @@ class MyGame(arcade.Window):
         elif key == arcade.key.S:
             self.Spressed = True
         elif key == arcade.key.P :
-            time.sleep(30)
+            self.pause = not self.pause
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
