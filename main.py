@@ -23,7 +23,7 @@ SPRITE_SCALING = 0.45
 SPRITE_SIZE = int(SPRITE_IMAGE_SIZE * SPRITE_SCALING)
 
 SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
+SCREEN_HEIGHT = 800
 HIT_SCALE = 1
 SCREEN_TITLE = "PAC-FREE-MAN"
 
@@ -121,7 +121,7 @@ class MyGame(arcade.Window):
         
 
         # Set up the player
-        resource = "D:\packman.png"
+        resource = ":resources:/images/packman.png"
         self.player = arcade.Sprite(resource, SPRITE_SCALING , hit_box_detail= HIT_SCALE)
         self.player.center_x = SPRITE_SIZE *10
         self.player.center_y = SPRITE_SIZE *10
@@ -130,7 +130,7 @@ class MyGame(arcade.Window):
         self.player.hit_box_detail = 1
 
         # Set enemies
-        resource = "D:\enemy.png"
+        resource = ":resources:/images/enemy.png"
         self.enemy = arcade.Sprite(resource, SPRITE_SCALING*1 , hit_box_detail= HIT_SCALE)
         self.enemy.center_x = (SPRITE_SIZE) * 4
         self.enemy.center_y = (SPRITE_SIZE) * 7
@@ -149,7 +149,7 @@ class MyGame(arcade.Window):
             for row in range(self.rows):
                 # if sprite i wall , actually we make it randomly
                 if (random.randrange(100) > 70) or (column == 0) or (row == 0) or (column == self.cols -1) or (row == self.rows -1):
-                    sprite = arcade.Sprite("D:\wall.png",0.39 ,
+                    sprite = arcade.Sprite(":resources:/images/wall.png",0.39 ,
                                            image_width=SPRITE_IMAGE_SIZE , image_height=SPRITE_IMAGE_SIZE , hit_box_detail= HIT_SCALE)
                     sprite.hit_box_detail = 1
                     x = (column + 1) * spacing
@@ -163,7 +163,7 @@ class MyGame(arcade.Window):
 
                 # if not , it is mini goal
                 else:
-                    sprite = arcade.Sprite("D:\minigoal.png",
+                    sprite = arcade.Sprite(":resources:/images/minigoal.png",
                                         SPRITE_SCALING, image_width=SPRITE_IMAGE_SIZE , image_height=SPRITE_IMAGE_SIZE , hit_box_detail= HIT_SCALE)
                     x = (column + 1) * spacing
                     y = (row + 1) * spacing
@@ -189,8 +189,7 @@ class MyGame(arcade.Window):
                 
         print("------")
         print(self.map)
-        self.physics_engine = arcade.PhysicsEngineSimple2(self.player, self.enemy,
-                                                         self.wall_list , True)
+        self.physics_engine = arcade.PhysicsEngineSimple2(self.player, self.enemy, self.wall_list)
 
         # --- Path related
         # This variable holds the travel-path. We keep it as an attribute so
