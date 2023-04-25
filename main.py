@@ -78,6 +78,7 @@ class MyGame(arcade.Window):
         # --- Related to paths
         # List of points that makes up a path between two points
         self.path = None
+        self.bfs_path = None
         # List of points we checked to see if there is a barrier there
         self.barrier_list = None
         self.search_barrier_list = None
@@ -118,10 +119,11 @@ class MyGame(arcade.Window):
         part = arcade.Point
         self.lastsoulpo = False
         self.pause = True
+        self.bfs_path = []
         
 
         # Set up the player
-        resource = ":resources:/images/packman.png"
+        resource = "D:\packman.png"
         self.player = arcade.Sprite(resource, SPRITE_SCALING , hit_box_detail= HIT_SCALE)
         self.player.center_x = SPRITE_SIZE *10
         self.player.center_y = SPRITE_SIZE *10
@@ -130,7 +132,7 @@ class MyGame(arcade.Window):
         self.player.hit_box_detail = 1
 
         # Set enemies
-        resource = ":resources:/images/enemy.png"
+        resource = "D:\enemy.png"
         self.enemy = arcade.Sprite(resource, SPRITE_SCALING*1 , hit_box_detail= HIT_SCALE)
         self.enemy.center_x = (SPRITE_SIZE) * 4
         self.enemy.center_y = (SPRITE_SIZE) * 7
@@ -149,8 +151,8 @@ class MyGame(arcade.Window):
             for row in range(self.rows):
                 # if sprite i wall , actually we make it randomly
                 if (random.randrange(100) > 70) or (column == 0) or (row == 0) or (column == self.cols -1) or (row == self.rows -1):
-                    sprite = arcade.Sprite(":resources:/images/wall.png",0.39 ,
-                                           image_width=SPRITE_IMAGE_SIZE , image_height=SPRITE_IMAGE_SIZE , hit_box_detail= HIT_SCALE)
+                    sprite = arcade.Sprite("D:\wall.png",0.39 ,
+                                           image_width=SPRITE_IMAGE_SIZE , image_height=SPRITE_IMAGE_SIZE , hit_box_algorithm= "None")
                     sprite.hit_box_detail = 1
                     x = (column + 1) * spacing
                     y = (row + 1) * spacing
@@ -163,8 +165,8 @@ class MyGame(arcade.Window):
 
                 # if not , it is mini goal
                 else:
-                    sprite = arcade.Sprite(":resources:/images/minigoal.png",
-                                        SPRITE_SCALING, image_width=SPRITE_IMAGE_SIZE , image_height=SPRITE_IMAGE_SIZE , hit_box_detail= HIT_SCALE)
+                    sprite = arcade.Sprite("D:\minigoal.png",
+                                        SPRITE_SCALING, image_width=SPRITE_IMAGE_SIZE , image_height=SPRITE_IMAGE_SIZE , hit_box_algorithm= "None")
                     x = (column + 1) * spacing
                     y = (row + 1) * spacing
                     sprite.center_x = x
@@ -194,7 +196,6 @@ class MyGame(arcade.Window):
         # --- Path related
         # This variable holds the travel-path. We keep it as an attribute so
         # we can calculate it in on_update, and draw it in on_draw.
-        self.path = None
         # Grid size for calculations. The smaller the grid, the longer the time
         # for calculations. Make sure the grid aligns with the sprite wall grid,
         # or some openings might be missed.
@@ -303,8 +304,11 @@ class MyGame(arcade.Window):
         self.enemy_list.draw()
         
         #2
-        if self.path:
-            arcade.draw_line_strip(self.path, arcade.color.BLUE, 2)
+        # if self.path :
+        #     arcade.draw_line_strip(self.path, arcade.color.BLUE, 2)
+        
+        if self.bfs_path :
+            arcade.draw_line_strip(self.bfs_path, arcade.color.RED, 2)
 
         # self.use()
         # self.clear()
@@ -345,7 +349,9 @@ class MyGame(arcade.Window):
                                                 self.player.position,
                                                 self.barrier_list,
                                                 diagonal_movement=False)
-
+        
+        start = (int(self.player.center_x//SPRITE_SIZE) , int(self.player.center_y//SPRITE_SIZE))
+        enemy_pos = (int(self.enemy.center_x//SPRITE_SIZE) , int(self.enemy.center_y//SPRITE_SIZE))
 
         
         if self.path and self.pause:
@@ -401,15 +407,37 @@ class MyGame(arcade.Window):
             # Reached the end of the list, start over.
             if self.i >= len(self.path):
                     self.i = 0
-            
-            start = (int(self.player.center_x//SPRITE_SIZE) , int(self.player.center_y//SPRITE_SIZE))
-            enemy_pos = (int(self.enemy.center_x//SPRITE_SIZE) , int(self.enemy.center_y//SPRITE_SIZE))
 
             # run bfs , return 2 value
+            # queue is our path
+            # -------------------------
+            self.queue.clear()
+            self.visited.clear()
             self.queue, self.visited = self.bfs(enemy_pos , start , self.graph)
+            i = start
+            self.bfs_path.clear()
+
             for x, y in self.visited:
                 if self.map_radar[x][y][0] == 1:
                     self.mgoal_list[self.map_radar[x][y][1]-1].color = (200 , 20 , 50)
+            #
+            while i in self.visited:
+                try:
+                    if self.map_radar[i[0]][i[1]][0] == 1:
+                        i = self.visited[i]
+                        self.mgoal_list[self.map_radar[i[0]][i[1]][1]-1].color = (10 , 20 , 200)
+                        # self.bfs_path.append([i[0]*SPRITE_SIZE , 
+                        #                       i[1]*SPRITE_SIZE])
+                        self.bfs_path.append(self.mgoal_list[self.map_radar[i[0]][i[1]][1]-1].position())
+
+                except:
+                    print("error")
+                
+                if i == enemy_pos:
+                    break
+
+
+            
 
             self.physics_engine.update()
 
