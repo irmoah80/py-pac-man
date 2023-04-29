@@ -1,9 +1,9 @@
 # AI Project : Pacman game
-wrote via [arcade library](https://api.arcade.academy/en/stable/index.html) with some changes in library, before runing main.py , please edit library files as below :
-## changing some arcade's files
-we just adding one function to handle moving two object - arcade support on object :
+Made by [arcade library](https://api.arcade.academy/en/stable/index.html) with some changes in library. Before runing main.py, please edit library files as below :
+## Changing some arcade's files
+Add this function to handle moving two objects - arcade supports just one object :
 ### 1. Add PhysicsEngineSimple2
-in your arcade library , go to file `physics_engines.py` and add this function after function `PhysicsEngineSimple` :
+In your arcade library, go to `physics_engines.py` and add this function after `PhysicsEngineSimple` :
 
 ```python
 class  PhysicsEngineSimple2:
@@ -39,7 +39,7 @@ class  PhysicsEngineSimple2:
 		return  _move_sprite(self.player_sprite,  self.walls,  ramp_up=False)+_move_sprite(self.enemy_sprite,  self.walls,  ramp_up=False)
 ```
 
-### 2. Next ...
+### 2. next ...
 after that add `from  .physics_engines  import  PhysicsEngineSimple2`to file `__init__.py`in arcade library in line 301
 
 ### 3. Finally!
