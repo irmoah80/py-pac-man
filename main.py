@@ -17,12 +17,14 @@ import random
 from arcade.experimental.crt_filter import CRTFilter
 from typing import List, NamedTuple, Optional, Sequence, Tuple, Union
 from pyglet.math import Vec2
+import arcade.gui
+
 
 SPRITE_IMAGE_SIZE = 83
 SPRITE_SCALING = 0.45
 SPRITE_SIZE = int(SPRITE_IMAGE_SIZE * SPRITE_SCALING)
 
-SCREEN_WIDTH = 1280
+SCREEN_WIDTH = 1150
 SCREEN_HEIGHT = 800
 HIT_SCALE = 1
 SCREEN_TITLE = "PAC-FREE-MAN"
@@ -74,6 +76,7 @@ class MyGame(arcade.Window):
         self.physics_engine = None
         self.Spressed = False
         self.pause = None
+        self.alofsoul = 'b'
 
         # --- Related to paths
         # List of points that makes up a path between two points
@@ -97,6 +100,106 @@ class MyGame(arcade.Window):
                                     display_warp = Vec2(1.0 / 80.0, 1.0 / 60.0),
                                     mask_dark=0.5,
                                     mask_light=1.5)
+        
+        style = {
+			"font_size" : 12,
+			"font_name" : "Kenney Mini Square"
+        }
+
+        style1 = {
+			"font_size" : 12,
+			"font_name" : "Kenney Mini Square"
+        }
+
+        style2 = {
+			"font_size" : 12,
+			"font_name" : "Kenney Mini Square"
+        }
+
+        style3 = {
+			"font_size" : 12,
+			"font_name" : "Kenney Mini Square"
+        }
+        
+        self.uimanager = arcade.gui.UIManager()
+        self.uimanager.enable()
+        self.bfsbtn = arcade.gui.UIFlatButton(text="bfs",
+											width=60, height = 30 , style=style)
+        self.dfsbtn = arcade.gui.UIFlatButton(text="dfs",
+											width=60, height = 30 , style=style1)
+        self.astbtn = arcade.gui.UIFlatButton(text="A*",
+											width=60, height = 30 , style=style3)
+        self.pausebtn = arcade.gui.UIFlatButton(text="pause",
+											width=100, height = 30 , style=style2)
+        self.bfsbtn.on_click = self.bfs_btn
+        self.dfsbtn.on_click = self.dfs_btn
+        self.astbtn.on_click = self.ast_btn
+        self.pausebtn.on_click = self.pause_btn
+
+        self.uimanager.add(
+			arcade.gui.UIAnchorWidget(
+                anchor_x="left",
+				anchor_y="top",
+				align_x=20,
+				align_y=-7,
+				child=self.bfsbtn)
+		)
+
+        self.uimanager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="left",
+				anchor_y="top",
+				align_x=90,
+				align_y=-7,
+				child=self.dfsbtn)
+		)
+
+        self.uimanager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="left",
+				anchor_y="top",
+				align_x=230,
+				align_y=-7,
+				child=self.pausebtn)
+		)
+
+        self.uimanager.add(
+			arcade.gui.UIAnchorWidget(
+				anchor_x="left",
+				anchor_y="top",
+				align_x=160,
+				align_y=-7,
+				child=self.astbtn)
+		)
+
+    def bfs_btn(self , event):
+        self.alofsoul = 'b'
+        self.bfsbtn.bg_color = (21, 100, 21)
+        self.dfsbtn.bg_color = (21, 19, 21)
+        self.astbtn.bg_color = (21, 19, 21)
+        
+
+    def dfs_btn(self , event):
+        self.alofsoul = 'd'
+        self.bfsbtn.bg_color = (21, 19, 21)
+        self.dfsbtn.bg_color = (21, 100, 21)
+        self.astbtn.bg_color = (21, 19, 21)
+
+
+    
+    def ast_btn(self , event):
+        self.bfsbtn.bg_color = (21, 19, 21)
+        self.astbtn.bg_color = (21, 100, 21)
+        self.dfsbtn.bg_color = (21, 19, 21)
+
+
+    def pause_btn(self , event):
+        self.pause = not self.pause
+        if not self.pause:
+            self.pausebtn.bg_color = (120, 100, 21)
+        else:
+            self.pausebtn.bg_color = (21, 19, 21)
+        pass
 
     def setup(self):
         """ Set up the game and initialize the variables. """
@@ -268,12 +371,18 @@ class MyGame(arcade.Window):
                     # print(graph[(x ,y)])
         return graph
 
-    def bfs(self, start, goal, graph):
+    def xfs(self , x , start, goal, graph):
+        assert x == 'b' or x == 'd', "x should equal 'b' or 'd' to make this bfs or dfs"
+
         queue = deque([start])
         visited = {start: None}
 
         while queue:
-            cur_node = queue.popleft()
+            if x == 'b':
+                cur_node = queue.popleft()
+            elif x == 'd':
+                cur_node = queue.pop()
+
             if cur_node == goal:
                 break
             try:
@@ -288,6 +397,8 @@ class MyGame(arcade.Window):
     
     def bfs_calculate_path(self , start , goal):
         pass
+
+
 
     def on_draw(self):
         """
@@ -304,11 +415,21 @@ class MyGame(arcade.Window):
         self.enemy_list.draw()
         
         #2
-        # if self.path :
-        #     arcade.draw_line_strip(self.path, arcade.color.BLUE, 2)
+        if self.path :
+            arcade.draw_line_strip(self.path, arcade.color.BLUE, 2)
+            # print("path --------")
+            # print(self.path)
         
         if self.bfs_path :
-            arcade.draw_line_strip(self.bfs_path, arcade.color.RED, 2)
+            arcade.draw_line_strip(self.bfs_path, arcade.color.RED, 2)#===================================
+
+        # self.bfs_path.clear()
+        
+
+        # print("bfs --------")
+        # print(self.bfs_path)
+
+        self.uimanager.draw()
 
         # self.use()
         # self.clear()
@@ -362,12 +483,23 @@ class MyGame(arcade.Window):
             start_x = self.enemy.center_x
             start_y = self.enemy.center_y
 
-            # Where are we going
-            
             self.dest_x = self.path[self.i][0]
             self.dest_y = self.path[self.i][1]
-            
 
+            # Where are we going
+            #print(self.bfs_path)
+            try:
+                if self.alofsoul == 'b' or 'd':
+                    self.dest_x = self.bfs_path[self.i][0]
+                    self.dest_y = self.bfs_path[self.i][1]
+                    print("dx , dy")
+                    print((self.dest_x , self.dest_y))
+            except Exception as e:
+                print("error")
+                print(e)
+
+            # self.dest_x = self.path[self.i][0]
+            # self.dest_y = self.path[self.i][1]
             # X and Y diff between the two
             x_diff = self.dest_x - start_x
             y_diff = self.dest_y - start_y
@@ -386,9 +518,6 @@ class MyGame(arcade.Window):
             # lower our speed so we don't overshoot.
 
             # Calculate vector to travel
-
-            
-
             change_y = math.sin(angle) * MOVEMENT_SPEED
             change_x = math.cos(angle) * MOVEMENT_SPEED
 
@@ -413,7 +542,7 @@ class MyGame(arcade.Window):
             # -------------------------
             self.queue.clear()
             self.visited.clear()
-            self.queue, self.visited = self.bfs(enemy_pos , start , self.graph)
+            self.queue, self.visited = self.xfs(self.alofsoul , enemy_pos , start , self.graph)
             i = start
             self.bfs_path.clear()
 
@@ -425,20 +554,25 @@ class MyGame(arcade.Window):
                 try:
                     if self.map_radar[i[0]][i[1]][0] == 1:
                         i = self.visited[i]
-                        self.mgoal_list[self.map_radar[i[0]][i[1]][1]-1].color = (10 , 20 , 200)
+                        pos1= self.map_radar[i[0]][i[1]][1]-1
+                        print(pos1)
+                        self.mgoal_list[pos1].color = (10 , 20 , 200)
                         # self.bfs_path.append([i[0]*SPRITE_SIZE , 
                         #                       i[1]*SPRITE_SIZE])
-                        self.bfs_path.append(self.mgoal_list[self.map_radar[i[0]][i[1]][1]-1].position())
+                        # print(self.mgoal_list[self.map_radar[i[0]][i[1]][1]-1])
+                        # print(self.mgoal_list[self.map_radar[i[0]][i[1]][1]-1].position())
+                        pos = (self.mgoal_list[pos1])
+                        if pos not in self.bfs_path:
+                            self.bfs_path.append((pos.center_x , pos.center_y))
+                except Exception as e:
+                    print(e)
 
-                except:
-                    print("error")
                 
                 if i == enemy_pos:
                     break
 
-
+            self.bfs_path.reverse()
             
-
             self.physics_engine.update()
 
 
