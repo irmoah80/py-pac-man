@@ -39,8 +39,8 @@ class  PhysicsEngineSimple2:
 		return  _move_sprite(self.player_sprite,  self.walls,  ramp_up=False)+_move_sprite(self.enemy_sprite,  self.walls,  ramp_up=False)
 ```
 
-### 2. next ...
-after that add `from  .physics_engines  import  PhysicsEngineSimple2`to file `__init__.py`in arcade library in line 301
+### 2. Next ...
+After that add `from  .physics_engines  import  PhysicsEngineSimple2`to file `__init__.py`in arcade library in line 301.
 
 ### 3. Finally!
-last , add `'PhysicsEngineSimple2'` in to file `__init__.py`in arcade library in line 382
+Last , add `'PhysicsEngineSimple2'` in to file `__init__.py`in arcade library in line 382.
