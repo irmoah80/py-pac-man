@@ -2,7 +2,7 @@
 wrote via [arcade library](https://api.arcade.academy/en/stable/index.html) with some changes in library, before runing main.py , please edit library files as below :
 ## changing some arcade's files
 we just adding one function to handle moving two object - arcade support on object :
-### 1. add PhysicsEngineSimple2
+### 1. Add PhysicsEngineSimple2
 in your arcade library , go to file `physics_engines.py` and add this function after function `PhysicsEngineSimple` :
 
 ```python
@@ -39,7 +39,7 @@ class  PhysicsEngineSimple2:
 		return  _move_sprite(self.player_sprite,  self.walls,  ramp_up=False)+_move_sprite(self.enemy_sprite,  self.walls,  ramp_up=False)
 ```
 
-### 2. next ...
+### 2. Next ...
 after that add `from  .physics_engines  import  PhysicsEngineSimple2`to file `__init__.py`in arcade library in line 301
 
 ### 3. Finally!
